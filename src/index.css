@@ -1,0 +1,8 @@
+body {
+    background-image: url('/tictactoe_background.jpg');
+    background-size: auto;
+    background-position: center;
+
+    background-color: #000b33;
+    background-blend-mode: darken;
+}

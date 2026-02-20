@@ -1,0 +1,98 @@
+.game-container {
+    font-family: "Share Tech Mono", monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1000px;
+    margin: auto;
+    margin-top: 20vh;
+}
+
+.tic-tac-toe_logo {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    margin: 30px;
+    border: 1px solid #00c4ff;
+    background-color: #0f2d99cc;
+    box-shadow:
+            0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+    border-radius: 4px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    line-height: 0.95;
+}
+
+.word_logo {
+    font-size: 120px;
+    color: #fff;
+}
+
+.tic_logo {
+    color: #0ff;
+    -webkit-text-stroke: 2px #fff;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0px 7px 0 #99dddd, 0px 5px 0 #07dddd;
+}
+
+.tac_logo {
+    color: #ffcc00;
+    -webkit-text-stroke: 2px #fff;
+    text-shadow:
+            0 0 10px #ffcc00,
+            0 0 20px #ffcc00,
+            0px 5px 0 #d8ad02,   /* podniesienie 3D */
+            0px 5px 0 #d8ad02;   /* głębia cienia */
+}
+
+.toe_logo {
+    color: #ff00dd;
+    -webkit-text-stroke: 2px #fff;
+    text-shadow:
+            0 0 10px #ff00dd,
+            0 0 20px #ff00dd,
+            0px 5px 0 #ec03cd,   /* podniesienie 3D */
+            0px 5px 0 #ec03cd;   /* głębia cienia */
+}
+
+.start-button_container {
+    position: relative;
+    border-radius: 4px;
+    border: 1px solid #00c4ff;
+    box-shadow:
+            0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+    transition: box-shadow 0.2s ease;
+}
+
+.start-button {
+    background: #0f2d99cc;
+    border: none;
+    color: #fff;
+    font-family: inherit;
+    font-size: 40px;
+    border-radius: 4px;
+    width: 250px;
+    height: 60px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s ease, filter 0.25s ease;
+}
+
+.start-button_container:hover {
+    animation: neonPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+    0% {
+        box-shadow:
+                0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+    }
+    50% {
+        box-shadow:
+                0 0 8px #00c4ff, 0 0 12px #00c4ff, 0 0 16px #00c4ff, 0 0 20px #00c4ff, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+    }
+    100% {
+        box-shadow:
+                0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+    }
+}
