@@ -1,0 +1,17 @@
+.game_board_cell_figure {
+    font-family: 'Consolas', monospace;
+    color: white;
+    font-weight: 600;
+    font-size: 80px;
+}
+
+.game_board_cell_figure_circle {
+    -webkit-text-stroke: 3px #3bff00;
+    text-shadow: 0 0 4px #3bff00, 0 0 6px #3bff00, 0 0 8px #3bff00, 0 0 10px #3bff00;
+}
+
+.game_board_cell_figure_cross {
+    -webkit-text-stroke: 3px #dc1818;
+    text-shadow: 0 0 4px #dc1818, 0 0 6px #dc1818, 0 0 8px #dc1818, 0 0 10px #dc1818;
+
+}

@@ -1,0 +1,101 @@
+.game-board_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    justify-content: center;
+    align-items: center;
+}
+
+.players_presentation {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 50px;
+}
+
+.player_presentation {
+    font-size: 22px;
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background-color: #0f2d99aa;
+    border-radius: 4px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-1_presentation {
+    border: 1px solid #3bff00;
+    box-shadow:
+            0 0 2px #3bff00, 0 0 3px #3bff00, 0 0 4px #3bff00, 0 0 5px #3bff00, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+}
+
+.player-2_presentation {
+    border: 1px solid #dc1818;
+    box-shadow:
+            0 0 2px #dc1818, 0 0 3px #dc1818, 0 0 4px #dc1818, 0 0 5px #dc1818, 0 0 100px #0f2d99, 0 0 200px #0f2d99;
+}
+
+.game-info-box {
+    margin: 50px;
+    font-size: 25px;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 20px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-board_cell {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    border: 1px solid #00c4ff;
+    box-shadow:
+            0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 10px #0f2d99, 0 0 20px #0f2d99;
+    background-color: #0f2d99aa;
+}
+
+.game-board_cell_button {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    background: transparent;
+    border: none;
+}
+
+.game-board_cell_button:not(:disabled) {
+    cursor: pointer;
+}
+
+.game-board_cell_button:not(:disabled):hover {
+    animation: neonPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+    0% {
+        box-shadow:
+                0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 10px #0f2d99, 0 0 20px #0f2d99;
+    }
+    50% {
+        box-shadow:
+                0 0 8px #00c4ff, 0 0 12px #00c4ff, 0 0 16px #00c4ff, 0 0 20px #00c4ff, 0 0 10px #0f2d99, 0 0 20px #0f2d99;
+    }
+    100% {
+        box-shadow:
+                0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 10px #0f2d99, 0 0 20px #0f2d99;
+    }
+}
