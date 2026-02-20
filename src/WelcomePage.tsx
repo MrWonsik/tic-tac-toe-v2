@@ -5,7 +5,6 @@ import GameBoardView from "./game-board/GameBoardView.tsx";
 
 function WelcomePage() {
     const backgroundMusic = useRef<HTMLAudioElement | null>(null);
-    const [musicPlaying, setMusicPlaying] = useState(true);
     const [gameStarted, setGameStarted] = useState(false);
 
     useEffect(() => {
@@ -19,19 +18,10 @@ function WelcomePage() {
         };
     }, []);
 
-    useEffect(() => {
-        if (!backgroundMusic.current) return;
-
-        if (musicPlaying) {
-            backgroundMusic.current.play();
-        } else {
-            backgroundMusic.current.pause();
-            backgroundMusic.current.currentTime = 0;
-        }
-    }, [musicPlaying]);
-
     const startGame = () => {
-        setMusicPlaying(true);
+        if (backgroundMusic.current) {
+            backgroundMusic.current.play();
+        }
         setGameStarted(true);
     }
 
