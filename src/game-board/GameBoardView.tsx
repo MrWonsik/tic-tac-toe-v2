@@ -25,7 +25,11 @@ const GameBoardView: React.FC<GameBoardViewProps> = ({ userFigure, opponentFigur
                     <FigureIcon playerFigure={opponentFigure} />
                 </div>
             </div>
-            <div className="game-info-box">Your turn</div>
+            <div className="game-info-box">
+                <span style={{ visibility: isUsersTurn ? "visible" : "hidden" }}>
+                    Your turn
+                </span>
+            </div>
             <div className="game-board">
                 {board.map(([index, figure]) => {
                     return <div key={Number(index)} className="game-board_cell">
