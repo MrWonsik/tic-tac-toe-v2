@@ -1,13 +1,13 @@
-import type { Figure } from "../types.ts";
+import type { PlayerFigure } from "../types.ts";
 import "./FigureIcon.css"
 
 interface FigureIconProps {
-    figure: Figure
+    playerFigure: PlayerFigure
 }
 
-const FigureIcon: React.FC<FigureIconProps> = ({ figure }) => {
+const FigureIcon: React.FC<FigureIconProps> = ({ playerFigure }) => {
     const figureRepresentation = (() => {
-        switch(figure) {
+        switch(playerFigure.figure) {
             case "circle": return "O";
             case "cross": return "X";
             default:
@@ -15,7 +15,7 @@ const FigureIcon: React.FC<FigureIconProps> = ({ figure }) => {
         }
     })();
 
-    return <span className={`game_board_cell_figure game_board_cell_figure_${figure}`}>
+    return <span className={`game_board_cell_figure game_board_cell_figure_${playerFigure.color}`}>
         {figureRepresentation}
     </span>
 };

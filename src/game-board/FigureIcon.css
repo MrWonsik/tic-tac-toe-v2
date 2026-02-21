@@ -5,12 +5,12 @@
     font-size: 80px;
 }
 
-.game_board_cell_figure_circle {
+.game_board_cell_figure_green {
     -webkit-text-stroke: 3px #3bff00;
     text-shadow: 0 0 4px #3bff00, 0 0 6px #3bff00, 0 0 8px #3bff00, 0 0 10px #3bff00;
 }
 
-.game_board_cell_figure_cross {
+.game_board_cell_figure_red {
     -webkit-text-stroke: 3px #dc1818;
     text-shadow: 0 0 4px #dc1818, 0 0 6px #dc1818, 0 0 8px #dc1818, 0 0 10px #dc1818;
 
