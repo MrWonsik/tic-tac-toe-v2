@@ -7,11 +7,17 @@ import { useGame } from "./useGame.ts";
 
 interface GameBoardViewProps {
     userFigure: PlayerFigure,
-    opponentFigure: PlayerFigure
+    opponentFigure: PlayerFigure,
+    onReturn(): void;
 }
 
-const GameBoardView: React.FC<GameBoardViewProps> = ({ userFigure, opponentFigure }) => {
-    const { board, userMove, isUsersTurn } = useGame(userFigure, opponentFigure);
+const GameBoardView: React.FC<GameBoardViewProps> = ({ userFigure, opponentFigure, onReturn }) => {
+    const { board, userMove, isUsersTurn, reset } = useGame(userFigure, opponentFigure);
+
+    const returnButtonClick = () => {
+        reset();
+        onReturn();
+    }
 
     return (
         <div className="game-board_container">
@@ -42,6 +48,10 @@ const GameBoardView: React.FC<GameBoardViewProps> = ({ userFigure, opponentFigur
                         </button>
                     </div>
                 })}
+            </div>
+            <div className="footer-buttons">
+                <button onClick={returnButtonClick}>Return</button>
+                <button onClick={reset}>Restart</button>
             </div>
         </div>
     );

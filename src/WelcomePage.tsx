@@ -33,7 +33,7 @@ const WelcomePage = () => {
         backgroundMusic.current.volume = 0.3;
 
         return () => {
-            backgroundMusic.current?.pause();
+            pauseMusic()
             backgroundMusic.current = null;
         };
     }, []);
@@ -45,10 +45,21 @@ const WelcomePage = () => {
         setGameStarted(true);
     }
 
+    const backToMainMenu = () => {
+        pauseMusic();
+        setGameStarted(false);
+    }
+
+    const pauseMusic = () => {
+        if (backgroundMusic.current) {
+            backgroundMusic.current.pause();
+        }
+    }
+
     return (
         <div className="game-container">
             {gameStarted
-                ? <GameBoardView userFigure={userFigure} opponentFigure={opponentFigure} />
+                ? <GameBoardView userFigure={userFigure} opponentFigure={opponentFigure} onReturn={backToMainMenu} />
                 : <StartView onStartButtonClick={startGame} />
             }
 

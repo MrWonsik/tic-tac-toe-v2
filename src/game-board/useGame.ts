@@ -92,5 +92,9 @@ export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) 
     const cellsEmpty = (index: number) => cells[index] == null;
     const cellsHasFigure = (index: number) => !cellsEmpty(index)
 
-    return { board: board(), userMove, isUsersTurn };
+    const reset = () => {
+        setCells(emptyCells);
+    }
+
+    return { board: board(), userMove, isUsersTurn, reset };
 };
