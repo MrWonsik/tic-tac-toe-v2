@@ -5,6 +5,20 @@ const OPPONTENT_THINKING_TIME_IN_MS = 500;
 const PLAYER_COLOR: FigureColor = "green";
 const OPPONENT_COLOR: FigureColor = "red";
 
+type WinningCombination = [number, number, number];
+
+const WINNING_COMBINATION: Array<WinningCombination> = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [6, 4, 2],
+];
+
+
 const randPlayerFigures = () => {
     const mainPlayer = { figure: randomFigure(), color: PLAYER_COLOR };
     const opponent = obtainOpponentFigure(mainPlayer);
@@ -33,6 +47,13 @@ export const useGame = () => {
     const [playerFigures, setPlayerFiguress] = useState<{ mainPlayer: PlayerFigure, opponent: PlayerFigure }>(randPlayerFigures());
     const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(emptyCells);
     const [isUserTurn, setUserTurn] = useState<boolean>(playerFigures.mainPlayer.figure === "circle");
+
+    useEffect(() => {
+        const potentialWinner = getPotentialWinner();
+        if (potentialWinner !== null) {
+            console.log(potentialWinner);
+        }
+    }, [cells])
 
     useEffect(() => {
         if(!isUserTurn) {
@@ -73,7 +94,7 @@ export const useGame = () => {
     }
 
     const opponentMove = () => {
-        if(isGameFinished() || isUserTurn) {
+        if(getPotentialWinner() || isUserTurn) {
             return;
         }
         const availableIndexes = board().filter(([, figure]) => figure == null).map(([index]) => Number(index));
@@ -84,36 +105,32 @@ export const useGame = () => {
     }
 
     const userMove = (index: number) => {
-        if(isGameFinished() || (!isUserTurn && cellsHasFigure(index))) {
+        if(getPotentialWinner() || (!isUserTurn && cellsHasFigure(index))) {
             return;
         }
         putFigure(index, playerFigures.mainPlayer);
         setUserTurn(false)
     };
 
-    const isGameFinished = () => {
-        const hasTheSameFigure = (cell1: PlayerFigure | null, cell2: PlayerFigure | null, cell3: PlayerFigure | null) => {
-            return cell1 && cell2 && cell3 &&
-                cell1.figure === cell2.figure &&
-                cell1.figure === cell3.figure &&
-                cell2.figure === cell3.figure;
-        }
+    const getPotentialWinner = (): { winningCombination: WinningCombination, winningFigure: PlayerFigure } | null => {
+        for (const [a, b, c] of WINNING_COMBINATION) {
+            const cell1 = cells[a];
+            const cell2 = cells[b];
+            const cell3 = cells[c];
 
-        if(
-            hasTheSameFigure(cells[0], cells[1], cells[2]) ||
-            hasTheSameFigure(cells[3], cells[4], cells[5]) ||
-            hasTheSameFigure(cells[6], cells[7], cells[8]) ||
-            hasTheSameFigure(cells[0], cells[3], cells[6]) ||
-            hasTheSameFigure(cells[1], cells[4], cells[7]) ||
-            hasTheSameFigure(cells[2], cells[5], cells[8]) ||
-            hasTheSameFigure(cells[0], cells[4], cells[8]) ||
-            hasTheSameFigure(cells[6], cells[4], cells[2])
-        ) {
-            alert("End of the game!");
-            return true;
+            if (
+                cell1 && cell2 && cell3 &&
+                cell1.figure === cell2.figure &&
+                cell1.figure === cell3.figure
+            ) {
+                return {
+                    winningCombination: [a, b, c],
+                    winningFigure: cell1
+                };
+            }
         }
-        return false;
-    }
+        return null;
+    };
 
     const cellsEmpty = (index: number) => cells[index] == null;
     const cellsHasFigure = (index: number) => !cellsEmpty(index)
