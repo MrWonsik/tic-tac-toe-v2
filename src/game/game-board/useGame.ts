@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import type {Figure, FigureColor, PlayerFigure} from "../../types.ts";
 
 const OPPONTENT_THINKING_TIME_IN_MS = 500;
@@ -6,6 +6,11 @@ const PLAYER_COLOR: FigureColor = "green";
 const OPPONENT_COLOR: FigureColor = "red";
 
 type WinningCombination = [number, number, number];
+
+interface WinnerInformation {
+    winningCombination: WinningCombination,
+    winningFigure: PlayerFigure
+}
 
 const WINNING_COMBINATION: Array<WinningCombination> = [
     [0, 1, 2],
@@ -39,31 +44,42 @@ const randomFigure = (): Figure => {
     return figures[index];
 }
 
-const emptyCells: Record<number, PlayerFigure | null> = {
+const createEmptyCells = (): Record<number, PlayerFigure | null> => ({
     0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null
+});
+
+function getPotentialWinner(cells: Record<number, PlayerFigure | null>): WinnerInformation | null {
+    for (const [a, b, c] of WINNING_COMBINATION) {
+        const cell1 = cells[a];
+        const cell2 = cells[b];
+        const cell3 = cells[c];
+
+        if (
+            cell1 && cell2 && cell3 &&
+            cell1.figure === cell2.figure &&
+            cell1.figure === cell3.figure
+        ) {
+            return {
+                winningCombination: [a, b, c],
+                winningFigure: cell1
+            };
+        }
+    }
+    return null;
+};
+
+const shouldPlayerStart = (playerFigure: Figure) => {
+    return playerFigure === "circle";
 }
 
 export const useGame = () => {
     const [playerFigures, setPlayerFiguress] = useState<{ mainPlayer: PlayerFigure, opponent: PlayerFigure }>(randPlayerFigures());
-    const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(emptyCells);
-    const [isUserTurn, setUserTurn] = useState<boolean>(playerFigures.mainPlayer.figure === "circle");
+    const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(createEmptyCells());
+    const [isUserTurn, setUserTurn] = useState<boolean>(shouldPlayerStart(playerFigures.mainPlayer.figure));
 
     useEffect(() => {
-        const potentialWinner = getPotentialWinner();
-        if (potentialWinner !== null) {
-            console.log(potentialWinner);
-        }
-    }, [cells])
-
-    useEffect(() => {
-        if(!isUserTurn) {
-            opponentMove();
-        }
-    }, [isUserTurn]);
-
-    useEffect(() => {
-        setUserTurn(playerFigures.mainPlayer.figure === "circle");
-    }, [playerFigures])
+        opponentMove();
+    }, [playerFigures, isUserTurn]);
 
     const putFigure = (index: number, figure: PlayerFigure) => {
         /*
@@ -79,8 +95,8 @@ export const useGame = () => {
           is 0 or 1. This keeps move order correct while keeping StrictMode active.
         */
         const canMove = () => {
-            const userCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === playerFigures.mainPlayer.figure).length;
-            const opponentCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === playerFigures.opponent.figure).length;
+            const userCount = Object.values(cells).filter((playerFigure) => playerFigure != null && playerFigure.figure === playerFigures.mainPlayer.figure).length;
+            const opponentCount = Object.values(cells).filter((playerFigure) => playerFigure != null && playerFigure.figure === playerFigures.opponent.figure).length;
             return Math.abs(userCount - opponentCount) <= 1;
         };
 
@@ -89,56 +105,52 @@ export const useGame = () => {
         }
     }
 
-    const board = () => {
-        return Object.entries(cells);
-    }
-
     const opponentMove = () => {
-        if(getPotentialWinner() || isUserTurn) {
+        if(isGameEnd() || isUserTurn) {
             return;
         }
-        const availableIndexes = board().filter(([, figure]) => figure == null).map(([index]) => Number(index));
+        const availableIndexes = Object.entries(cells).filter(([, figure]) => figure == null).map(([index]) => Number(index));
         setTimeout(() => {
+            if (isGameEnd()) return;
             putFigure(availableIndexes[Math.floor(Math.random() * availableIndexes.length)], playerFigures.opponent);
             setUserTurn(true);
         }, OPPONTENT_THINKING_TIME_IN_MS);
     }
 
     const userMove = (index: number) => {
-        if(getPotentialWinner() || (!isUserTurn && cellsHasFigure(index))) {
+        if(isGameEnd() || (!isUserTurn && cellsHasFigure(index))) {
             return;
         }
         putFigure(index, playerFigures.mainPlayer);
         setUserTurn(false)
     };
 
-    const getPotentialWinner = (): { winningCombination: WinningCombination, winningFigure: PlayerFigure } | null => {
-        for (const [a, b, c] of WINNING_COMBINATION) {
-            const cell1 = cells[a];
-            const cell2 = cells[b];
-            const cell3 = cells[c];
-
-            if (
-                cell1 && cell2 && cell3 &&
-                cell1.figure === cell2.figure &&
-                cell1.figure === cell3.figure
-            ) {
-                return {
-                    winningCombination: [a, b, c],
-                    winningFigure: cell1
-                };
-            }
-        }
-        return null;
-    };
-
     const cellsEmpty = (index: number) => cells[index] == null;
     const cellsHasFigure = (index: number) => !cellsEmpty(index)
 
     const reset = () => {
-        setCells(emptyCells);
-        setPlayerFiguress(randPlayerFigures());
+        setCells(createEmptyCells());
+        const playerFigure = randPlayerFigures();
+        setPlayerFiguress(playerFigure);
+        setUserTurn(shouldPlayerStart(playerFigure.mainPlayer.figure));
     }
 
-    return { board: board(), userMove, isUserTurn, reset, playerFigures };
+    const isGameEnd = () => {
+        const allCellsFill = Object.values(cells).every((figure) => figure !== null)
+        const potentialWinner = getPotentialWinner(cells);
+
+        return allCellsFill || potentialWinner;
+    }
+
+    return {
+        gameInfo: {
+            board: Object.entries(cells),
+            isUserTurn,
+            playerFigures,
+            gameEnd: isGameEnd(),
+            winnerInfo: getPotentialWinner(cells)
+        },
+        userMove,
+        reset
+    };
 };

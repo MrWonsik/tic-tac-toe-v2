@@ -11,8 +11,20 @@ interface GameBoardViewProps {
     musicStatus: MusicState;
 }
 
-const GameBoardView: React.FC<GameBoardViewProps> = ({ onReturn, toggleMusic, musicStatus }) => {
-    const { board, userMove, isUserTurn, reset, playerFigures } = useGame();
+
+const GameBoardView: React.FC<GameBoardViewProps> = ({onReturn, toggleMusic, musicStatus}) => {
+    const {gameInfo: { board, isUserTurn, playerFigures, winnerInfo, gameEnd }, userMove, reset } = useGame();
+
+    const getMessage = () => {
+        if(gameEnd) {
+            return <span>
+                { winnerInfo?.winningFigure === playerFigures.mainPlayer ? "You win" : "You lose" }
+            </span>
+        }
+        return <span style={{visibility: isUserTurn ? "visible" : "hidden"}}>
+            Your turn
+        </span>
+    };
 
     const returnButtonClick = () => {
         reset();
@@ -20,7 +32,6 @@ const GameBoardView: React.FC<GameBoardViewProps> = ({ onReturn, toggleMusic, mu
     }
 
     const generateMusicIcon = () => {
-        console.log(musicStatus);
         switch(musicStatus) {
             case "play": return <MdMusicNote className="footer-button_icon" />
             case "pause": return <MdMusicOff className="footer-button_icon" />
@@ -43,17 +54,15 @@ const GameBoardView: React.FC<GameBoardViewProps> = ({ onReturn, toggleMusic, mu
                 </div>
             </div>
             <div className="game-info-box">
-                <span style={{ visibility: isUserTurn ? "visible" : "hidden"}}>
-                    Your turn
-                </span>
+                {getMessage()}
             </div>
             <div className="game-board">
                 {board.map(([index, figure]) => {
-                    return <div key={Number(index)} className="game-board_cell">
+                    return <div key={Number(index)} className={winnerInfo?.winningCombination.includes(Number(index)) ? "game-board_cell_win game-board_cell" : "game-board_cell"}>
                         <button
                             className="game-board_cell_button"
                             onClick={() => userMove(Number(index))}
-                            disabled={!isUserTurn || figure != null}
+                            disabled={gameEnd || !isUserTurn || figure != null}
                         >
                             {figure && <FigureIcon playerFigure={figure}/>}
                         </button>
