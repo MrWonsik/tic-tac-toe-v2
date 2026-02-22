@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import './WelcomePage.css'
 import StartView from "./StartView.tsx";
 import GameBoardView from "./game-board/GameBoardView.tsx";
