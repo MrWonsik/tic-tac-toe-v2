@@ -16,14 +16,19 @@ const GameBoardView: React.FC<GameBoardViewProps> = ({onReturn, toggleMusic, mus
     const {gameInfo: { board, isUserTurn, playerFigures, winnerInfo, gameEnd }, userMove, reset } = useGame();
 
     const getMessage = () => {
-        if(gameEnd) {
-            return <span>
-                { winnerInfo?.winningFigure === playerFigures.mainPlayer ? "You win" : "You lose" }
-            </span>
+        let text: string;
+
+        if (gameEnd) {
+            text = winnerInfo
+                ? (winnerInfo.winningFigure === playerFigures.mainPlayer ? "You win" : "You lose")
+                : "Draw";
+        } else {
+            text = "Your turn";
         }
-        return <span style={{visibility: isUserTurn ? "visible" : "hidden"}}>
-            Your turn
-        </span>
+
+        return <span style={{ visibility: !gameEnd && !isUserTurn ? "hidden" : "visible" }}>
+        {text}
+    </span>;
     };
 
     const returnButtonClick = () => {

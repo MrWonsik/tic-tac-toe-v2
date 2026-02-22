@@ -100,7 +100,7 @@ export const useGame = () => {
             return Math.abs(userCount - opponentCount) <= 1;
         };
 
-        if(cellsEmpty(index) && canMove()) {
+        if(cellIsEmpty(index) && canMove()) {
             setCells((prev: Record<number, PlayerFigure | null>) => ({...prev, [index]: figure }));
         }
     }
@@ -109,24 +109,63 @@ export const useGame = () => {
         if(isGameEnd() || isUserTurn) {
             return;
         }
-        const availableIndexes = Object.entries(cells).filter(([, figure]) => figure == null).map(([index]) => Number(index));
+
+        const findBestCell = () => {
+            const getCriticalFields = (figureToCheck: PlayerFigure): Array<number> => {
+                const fields: number[] = [];
+
+                WINNING_COMBINATION.forEach(winCombo => {
+                    const moves = Object.entries(cells).filter(([, figure]) => figure === figureToCheck).map(([index,]) => Number(index));
+                    const filledCount = winCombo.filter(index => moves.includes(index)).length;
+                    const emptyFields = winCombo.filter(index => cellIsEmpty(index));
+
+                    if (filledCount === 2 && emptyFields.length === 1) {
+                        fields.push(emptyFields[0]);
+                    }
+                });
+
+                return fields;
+            };
+
+            const getRandomEmptyField = () => {
+                const empties = Object.entries(cells).filter(([, figure]) => figure === null).map(([index]) => Number(index));
+                return empties[Math.floor(Math.random() * empties.length)];
+            };
+
+            const allCellsEmpty = Object.values(cells).every((figure) => figure === null);
+
+            if (allCellsEmpty) return 4;
+
+            const winningFields = getCriticalFields(playerFigures.opponent);
+            if (winningFields.length > 0) {
+                return winningFields[Math.floor(Math.random() * winningFields.length)];
+            }
+
+            const blockingFields = getCriticalFields(playerFigures.mainPlayer);
+            if (blockingFields.length > 0) {
+                return blockingFields[Math.floor(Math.random() * blockingFields.length)];
+            }
+
+            return getRandomEmptyField();
+        }
+
         setTimeout(() => {
             if (isGameEnd()) return;
-            putFigure(availableIndexes[Math.floor(Math.random() * availableIndexes.length)], playerFigures.opponent);
+            putFigure(findBestCell(), playerFigures.opponent);
             setUserTurn(true);
         }, OPPONTENT_THINKING_TIME_IN_MS);
     }
 
     const userMove = (index: number) => {
-        if(isGameEnd() || (!isUserTurn && cellsHasFigure(index))) {
+        if(isGameEnd() || (!isUserTurn && cellHasFigure(index))) {
             return;
         }
         putFigure(index, playerFigures.mainPlayer);
         setUserTurn(false)
     };
 
-    const cellsEmpty = (index: number) => cells[index] == null;
-    const cellsHasFigure = (index: number) => !cellsEmpty(index)
+    const cellIsEmpty = (index: number) => cells[index] == null;
+    const cellHasFigure = (index: number) => !cellIsEmpty(index)
 
     const reset = () => {
         setCells(createEmptyCells());
@@ -139,7 +178,7 @@ export const useGame = () => {
         const allCellsFill = Object.values(cells).every((figure) => figure !== null)
         const potentialWinner = getPotentialWinner(cells);
 
-        return allCellsFill || potentialWinner;
+        return Boolean(allCellsFill || potentialWinner);
     }
 
     return {
