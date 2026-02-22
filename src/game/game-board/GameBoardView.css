@@ -100,3 +100,55 @@
                 0 0 2px #00c4ff, 0 0 3px #00c4ff, 0 0 4px #00c4ff, 0 0 5px #00c4ff, 0 0 10px #0f2d99, 0 0 20px #0f2d99;
     }
 }
+
+.footer-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 5vh;
+    gap: 20px;
+}
+
+.footer-button {
+    color: #00c4ff;
+    gap: 10px;
+    padding: 20px;
+    background-color: transparent;
+    border: 0;
+}
+
+.footer-button_icon {
+    font-size: 45px;
+    filter:
+        drop-shadow(0 0 4px #00c4ff)
+        drop-shadow(0 0 10px #0f2d99)
+        drop-shadow(0 0 20px #0f2d99);
+    cursor: pointer;
+}
+
+.footer-button_icon:hover {
+    animation: neonPulseIcon 1.2s ease-in-out infinite;
+}
+
+@keyframes neonPulseIcon {
+    0% {
+        filter:
+                drop-shadow(0 0 4px #00c4ff)
+                drop-shadow(0 0 10px #0f2d99)
+                drop-shadow(0 0 20px #0f2d99);
+    }
+    50% {
+        filter:
+                drop-shadow(0 0 4px #00c4ff)
+                drop-shadow(0 0 6px #00c4ff)
+                drop-shadow(0 0 10px #0f2d99)
+                drop-shadow(0 0 20px #0f2d99);
+    }
+    100% {
+        filter:
+                drop-shadow(0 0 4px #00c4ff)
+                drop-shadow(0 0 10px #0f2d99)
+                drop-shadow(0 0 20px #0f2d99);
+    }
+}

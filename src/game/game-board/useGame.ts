@@ -1,22 +1,48 @@
 import {useEffect, useState} from "react";
-import type {PlayerFigure} from "../types.ts";
+import type {Figure, FigureColor, PlayerFigure} from "../../types.ts";
 
 const OPPONTENT_THINKING_TIME_IN_MS = 500;
+const PLAYER_COLOR: FigureColor = "green";
+const OPPONENT_COLOR: FigureColor = "red";
+
+const randPlayerFigures = () => {
+    const mainPlayer = { figure: randomFigure(), color: PLAYER_COLOR };
+    const opponent = obtainOpponentFigure(mainPlayer);
+    return { mainPlayer, opponent}
+}
+
+const obtainOpponentFigure = (userFigure: PlayerFigure): PlayerFigure => {
+    const opponentFigure = userFigure.figure === "circle" ? "cross" : "circle";
+    return {
+        figure: opponentFigure,
+        color: OPPONENT_COLOR
+    }
+}
+
+const randomFigure = (): Figure => {
+    const figures: Array<Figure> = ["circle", "cross"];
+    const index = Math.floor(Math.random() * figures.length);
+    return figures[index];
+}
 
 const emptyCells: Record<number, PlayerFigure | null> = {
     0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null
 }
 
-export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) => {
+export const useGame = () => {
+    const [playerFigures, setPlayerFiguress] = useState<{ mainPlayer: PlayerFigure, opponent: PlayerFigure }>(randPlayerFigures());
     const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(emptyCells);
-    const userFirst = userFigure.figure === "circle";
-    const [isUsersTurn, setUsersTurn] = useState<boolean>(userFirst);
+    const [isUserTurn, setUserTurn] = useState<boolean>(playerFigures.mainPlayer.figure === "circle");
 
     useEffect(() => {
-        if(!isUsersTurn) {
+        if(!isUserTurn) {
             opponentMove();
         }
-    }, [isUsersTurn]);
+    }, [isUserTurn]);
+
+    useEffect(() => {
+        setUserTurn(playerFigures.mainPlayer.figure === "circle");
+    }, [playerFigures])
 
     const putFigure = (index: number, figure: PlayerFigure) => {
         /*
@@ -32,8 +58,8 @@ export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) 
           is 0 or 1. This keeps move order correct while keeping StrictMode active.
         */
         const canMove = () => {
-            const userCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === userFigure.figure).length;
-            const opponentCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === opponentFigure.figure).length;
+            const userCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === playerFigures.mainPlayer.figure).length;
+            const opponentCount = board().filter(([, playerFigure]) => playerFigure != null && playerFigure.figure === playerFigures.opponent.figure).length;
             return Math.abs(userCount - opponentCount) <= 1;
         };
 
@@ -47,22 +73,22 @@ export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) 
     }
 
     const opponentMove = () => {
-        if(isGameFinished() || isUsersTurn) {
+        if(isGameFinished() || isUserTurn) {
             return;
         }
         const availableIndexes = board().filter(([, figure]) => figure == null).map(([index]) => Number(index));
         setTimeout(() => {
-            putFigure(availableIndexes[Math.floor(Math.random() * availableIndexes.length)], opponentFigure);
-            setUsersTurn(true);
+            putFigure(availableIndexes[Math.floor(Math.random() * availableIndexes.length)], playerFigures.opponent);
+            setUserTurn(true);
         }, OPPONTENT_THINKING_TIME_IN_MS);
     }
 
     const userMove = (index: number) => {
-        if(isGameFinished() || (!isUsersTurn && cellsHasFigure(index))) {
+        if(isGameFinished() || (!isUserTurn && cellsHasFigure(index))) {
             return;
         }
-        putFigure(index, userFigure);
-        setUsersTurn(false)
+        putFigure(index, playerFigures.mainPlayer);
+        setUserTurn(false)
     };
 
     const isGameFinished = () => {
@@ -79,7 +105,7 @@ export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) 
             hasTheSameFigure(cells[6], cells[7], cells[8]) ||
             hasTheSameFigure(cells[0], cells[3], cells[6]) ||
             hasTheSameFigure(cells[1], cells[4], cells[7]) ||
-            hasTheSameFigure(cells[2], cells[5], cells[5]) ||
+            hasTheSameFigure(cells[2], cells[5], cells[8]) ||
             hasTheSameFigure(cells[0], cells[4], cells[8]) ||
             hasTheSameFigure(cells[6], cells[4], cells[2])
         ) {
@@ -94,7 +120,8 @@ export const useGame = (userFigure: PlayerFigure, opponentFigure: PlayerFigure) 
 
     const reset = () => {
         setCells(emptyCells);
+        setPlayerFiguress(randPlayerFigures());
     }
 
-    return { board: board(), userMove, isUsersTurn, reset };
+    return { board: board(), userMove, isUserTurn, reset, playerFigures };
 };

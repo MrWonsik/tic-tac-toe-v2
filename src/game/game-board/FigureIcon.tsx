@@ -1,4 +1,4 @@
-import type { PlayerFigure } from "../types.ts";
+import type { PlayerFigure } from "../../types.ts";
 import "./FigureIcon.css"
 
 interface FigureIconProps {
