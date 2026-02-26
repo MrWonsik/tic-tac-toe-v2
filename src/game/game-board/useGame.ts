@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import type {
     Figure,
     FigureColor,
@@ -7,6 +7,7 @@ import type {
     WinnerInformation,
     WinningCombination
 } from "../../types.ts";
+import {Board} from "./Board.ts";
 
 const OPPONTENT_THINKING_TIME_IN_MS = 500;
 const PLAYER_COLOR: FigureColor = "green";
@@ -43,10 +44,6 @@ const randomFigure = (): Figure => {
     return figures[index];
 }
 
-const createEmptyCells = (): Record<number, PlayerFigure | null> => ({
-    0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null
-});
-
 function getPotentialWinner(cells: Record<number, PlayerFigure | null>): WinnerInformation | null {
     for (const [a, b, c] of WINNING_COMBINATION) {
         const cell1 = cells[a];
@@ -72,19 +69,13 @@ const shouldPlayerStart = (playerFigure: Figure) => {
 }
 
 export const useGame = () => {
+    const board = useRef(new Board())
     const [playerFigures, setPlayerFiguress] = useState<PlayerFigures>(randPlayerFigures());
-    const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(createEmptyCells());
     const [isUserTurn, setUserTurn] = useState<boolean>(shouldPlayerStart(playerFigures.mainPlayer.figure));
 
     useEffect(() => {
         opponentMove();
     }, [playerFigures, isUserTurn]);
-
-    const putFigure = (index: number, figure: PlayerFigure) => {
-        if(cellIsEmpty(index)) {
-            setCells((prev: Record<number, PlayerFigure | null>) => ({...prev, [index]: figure }));
-        }
-    }
 
     const opponentMove = () => {
         if(isGameEnd() || isUserTurn) {
@@ -96,9 +87,9 @@ export const useGame = () => {
                 const fields: number[] = [];
 
                 WINNING_COMBINATION.forEach(winCombo => {
-                    const moves = Object.entries(cells).filter(([, figure]) => figure === figureToCheck).map(([index,]) => Number(index));
+                    const moves: Array<number> = board.current.cellsForFigure(figureToCheck);
                     const filledCount = winCombo.filter(index => moves.includes(index)).length;
-                    const emptyFields = winCombo.filter(index => cellIsEmpty(index));
+                    const emptyFields = winCombo.filter(index => board.current.cellIsEmpty(index));
 
                     if (filledCount === 2 && emptyFields.length === 1) {
                         fields.push(emptyFields[0]);
@@ -109,13 +100,11 @@ export const useGame = () => {
             };
 
             const getRandomEmptyField = () => {
-                const empties = Object.entries(cells).filter(([, figure]) => figure === null).map(([index]) => Number(index));
+                const empties = board.current.emptyCells()
                 return empties[Math.floor(Math.random() * empties.length)];
             };
 
-            const allCellsEmpty = Object.values(cells).every((figure) => figure === null);
-
-            if (allCellsEmpty) return 4;
+            if (board.current.isEmpty()) return 4;
 
             const winningFields = getCriticalFields(playerFigures.opponent);
             if (winningFields.length > 0) {
@@ -132,43 +121,39 @@ export const useGame = () => {
 
         setTimeout(() => {
             if (isGameEnd()) return;
-            putFigure(findBestCell(), playerFigures.opponent);
+            board.current.putFigure(findBestCell(), playerFigures.opponent);
             setUserTurn(true);
         }, OPPONTENT_THINKING_TIME_IN_MS);
     }
 
     const userMove = (index: number) => {
-        if(isGameEnd() || (!isUserTurn && cellHasFigure(index))) {
+        if(isGameEnd() || (!isUserTurn && board.current.cellHasFigure(index))) {
             return;
         }
-        putFigure(index, playerFigures.mainPlayer);
+        board.current.putFigure(index, playerFigures.mainPlayer);
         setUserTurn(false)
     };
 
-    const cellIsEmpty = (index: number) => cells[index] == null;
-    const cellHasFigure = (index: number) => !cellIsEmpty(index)
-
     const reset = () => {
-        setCells(createEmptyCells());
+        board.current.resetBoard();
         const playerFigure = randPlayerFigures();
         setPlayerFiguress(playerFigure);
         setUserTurn(shouldPlayerStart(playerFigure.mainPlayer.figure));
     }
 
     const isGameEnd = () => {
-        const allCellsFill = Object.values(cells).every((figure) => figure !== null)
-        const potentialWinner = getPotentialWinner(cells);
+        const potentialWinner = getPotentialWinner(board.current.getCells());
 
-        return Boolean(allCellsFill || potentialWinner);
+        return Boolean(board.current.isFull() || potentialWinner);
     }
 
     return {
         gameInfo: {
-            board: Object.entries(cells),
+            board: Object.entries(board.current.getCells()),
             isUserTurn,
             playerFigures,
             gameEnd: isGameEnd(),
-            winnerInfo: getPotentialWinner(cells)
+            winnerInfo: getPotentialWinner(board.current.getCells())
         },
         userMove,
         reset
