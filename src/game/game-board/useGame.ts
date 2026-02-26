@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import type {Figure, FigureColor, PlayerFigure} from "../../types.ts";
+import type {
+    Figure,
+    FigureColor,
+    PlayerFigure,
+    PlayerFigures,
+    WinnerInformation,
+    WinningCombination
+} from "../../types.ts";
 
 const OPPONTENT_THINKING_TIME_IN_MS = 500;
 const PLAYER_COLOR: FigureColor = "green";
 const OPPONENT_COLOR: FigureColor = "red";
-
-type WinningCombination = [number, number, number];
-
-interface WinnerInformation {
-    winningCombination: WinningCombination,
-    winningFigure: PlayerFigure
-}
 
 const WINNING_COMBINATION: Array<WinningCombination> = [
     [0, 1, 2],
@@ -22,7 +22,6 @@ const WINNING_COMBINATION: Array<WinningCombination> = [
     [0, 4, 8],
     [6, 4, 2],
 ];
-
 
 const randPlayerFigures = () => {
     const mainPlayer = { figure: randomFigure(), color: PLAYER_COLOR };
@@ -73,7 +72,7 @@ const shouldPlayerStart = (playerFigure: Figure) => {
 }
 
 export const useGame = () => {
-    const [playerFigures, setPlayerFiguress] = useState<{ mainPlayer: PlayerFigure, opponent: PlayerFigure }>(randPlayerFigures());
+    const [playerFigures, setPlayerFiguress] = useState<PlayerFigures>(randPlayerFigures());
     const [cells, setCells] = useState<Record<number, PlayerFigure | null>>(createEmptyCells());
     const [isUserTurn, setUserTurn] = useState<boolean>(shouldPlayerStart(playerFigures.mainPlayer.figure));
 
@@ -82,25 +81,7 @@ export const useGame = () => {
     }, [playerFigures, isUserTurn]);
 
     const putFigure = (index: number, figure: PlayerFigure) => {
-        /*
-          ADR: Handle StrictMode double render for opponent move
-
-          In React 18 StrictMode (development), components are rendered twice
-          on mount to detect side-effects. This can cause the opponent
-          to execute two moves on initial render.
-
-          To address this without disabling StrictMode, I validate moves by
-          checking the absolute difference between the number of player and
-          opponent figures on the board. Only allow a move if the difference
-          is 0 or 1. This keeps move order correct while keeping StrictMode active.
-        */
-        const canMove = () => {
-            const userCount = Object.values(cells).filter((playerFigure) => playerFigure != null && playerFigure.figure === playerFigures.mainPlayer.figure).length;
-            const opponentCount = Object.values(cells).filter((playerFigure) => playerFigure != null && playerFigure.figure === playerFigures.opponent.figure).length;
-            return Math.abs(userCount - opponentCount) <= 1;
-        };
-
-        if(cellIsEmpty(index) && canMove()) {
+        if(cellIsEmpty(index)) {
             setCells((prev: Record<number, PlayerFigure | null>) => ({...prev, [index]: figure }));
         }
     }

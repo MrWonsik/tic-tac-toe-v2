@@ -1,9 +1,11 @@
 import React from "react";
-import { MdArrowBack, MdMusicNote, MdMusicOff, MdOutlineRefresh  } from 'react-icons/md';
-import FigureIcon from './FigureIcon.tsx';
+import type {MusicState} from "../useBackgroundMusic.ts";
 import { useGame } from "./useGame.ts";
 import "./GameBoardView.css";
-import type {MusicState} from "../useBackgroundMusic.ts";
+import ActionButtons from "./ActionButtons.tsx";
+import PlayersPresentation from "./PlayersPresentation.tsx";
+import GameBoard from "./GameBoard.tsx";
+import GameInfoBox from "./GameInfoBox.tsx";
 
 interface GameBoardViewProps {
     onReturn(): void;
@@ -11,80 +13,37 @@ interface GameBoardViewProps {
     musicStatus: MusicState;
 }
 
-
 const GameBoardView: React.FC<GameBoardViewProps> = ({onReturn, toggleMusic, musicStatus}) => {
     const {gameInfo: { board, isUserTurn, playerFigures, winnerInfo, gameEnd }, userMove, reset } = useGame();
-
-    const getMessage = () => {
-        let text: string;
-
-        if (gameEnd) {
-            text = winnerInfo
-                ? (winnerInfo.winningFigure === playerFigures.mainPlayer ? "You win" : "You lose")
-                : "Draw";
-        } else {
-            text = "Your turn";
-        }
-
-        return <span style={{ visibility: !gameEnd && !isUserTurn ? "hidden" : "visible" }}>
-        {text}
-    </span>;
-    };
 
     const returnButtonClick = () => {
         reset();
         onReturn();
     }
 
-    const generateMusicIcon = () => {
-        switch(musicStatus) {
-            case "play": return <MdMusicNote className="footer-button_icon" />
-            case "pause": return <MdMusicOff className="footer-button_icon" />
-            case "invalid":
-            default:
-                return;
-        }
-    }
-
     return (
         <div className="game-board_container">
-            <div className="players_presentation">
-                <div className="player_presentation player-1_presentation">
-                    <span>Player1</span>
-                    <FigureIcon playerFigure={playerFigures.mainPlayer}/>
-                </div>
-                <div className="player_presentation player-2_presentation">
-                    <span>Player2</span>
-                    <FigureIcon playerFigure={playerFigures.opponent}/>
-                </div>
-            </div>
-            <div className="game-info-box">
-                {getMessage()}
-            </div>
-            <div className="game-board">
-                {board.map(([index, figure]) => {
-                    return <div key={Number(index)} className={winnerInfo?.winningCombination.includes(Number(index)) ? "game-board_cell_win game-board_cell" : "game-board_cell"}>
-                        <button
-                            className="game-board_cell_button"
-                            onClick={() => userMove(Number(index))}
-                            disabled={gameEnd || !isUserTurn || figure != null}
-                        >
-                            {figure && <FigureIcon playerFigure={figure}/>}
-                        </button>
-                    </div>
-                })}
-            </div>
-            <div className="footer-buttons">
-                <button className="footer-button" onClick={returnButtonClick}>
-                    <MdArrowBack className="footer-button_icon" />
-                </button>
-                <button className="footer-button" onClick={reset}>
-                    <MdOutlineRefresh className="footer-button_icon" />
-                </button>
-                <button className="footer-button" onClick={toggleMusic}>
-                    {generateMusicIcon()}
-                </button>
-            </div>
+            <PlayersPresentation playerFigures={playerFigures} />
+            <GameInfoBox
+                gameEnd={gameEnd}
+                winnerInfo={winnerInfo}
+                playerFigures={playerFigures}
+                isUserTurn={isUserTurn}
+            />
+            <GameBoard
+                board={board}
+                isWinningCell={
+                    (index) => winnerInfo?.winningCombination.includes(index)
+                }
+                cellDisabled={gameEnd || !isUserTurn}
+                onCellClick={(index) => userMove(index)}
+            />
+            <ActionButtons
+                onReturnClick={returnButtonClick}
+                onResetClick={reset}
+                toggleMusic={toggleMusic}
+                musicStatus={musicStatus}
+            />
         </div>
     );
 };
