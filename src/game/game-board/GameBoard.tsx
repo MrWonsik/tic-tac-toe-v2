@@ -1,6 +1,7 @@
 import React from 'react';
 import FigureIcon from "./FigureIcon.tsx";
 import type {PlayerFigure} from "../../types.ts";
+import "./GameBoard.css"
 
 interface GameBoardProps {
     board: [string, PlayerFigure | null][],

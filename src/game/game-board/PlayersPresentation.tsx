@@ -1,6 +1,7 @@
 import React from 'react';
 import FigureIcon from "./FigureIcon.tsx";
 import type {PlayerFigures} from "../../types.ts";
+import "./PlayersPresentation.css"
 
 interface PlayersPresentationProps {
     playerFigures: PlayerFigures

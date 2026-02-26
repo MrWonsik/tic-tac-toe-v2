@@ -1,6 +1,7 @@
 import React from 'react';
 import {MdArrowBack, MdMusicNote, MdMusicOff, MdOutlineRefresh} from "react-icons/md";
 import type {MusicState} from "../useBackgroundMusic.ts";
+import "./ActionButtons.css"
 
 const generateMusicIcon = (musicStatus: MusicState) => {
     switch(musicStatus) {

@@ -8,6 +8,8 @@ const WelcomePage = () => {
     const { pauseMusic, restartMusic, toggleMusic, musicStatus } = useBackgroundMusic("/mozart.ogg", 0.3);
     const [gameStarted, setGameStarted] = useState(false);
 
+    const version = import.meta.env.VITE_APP_VERSION ?? "dev";
+
     const startGame = () => {
         restartMusic();
         setGameStarted(true);
@@ -24,7 +26,7 @@ const WelcomePage = () => {
                 ? <GameBoardView onReturn={backToMainMenu} toggleMusic={toggleMusic} musicStatus={musicStatus} />
                 : <StartView onStartButtonClick={startGame} />
             }
-
+            <footer className="game-version_info-box">{version}</footer>
         </div>
     )
 }

@@ -7,4 +7,11 @@
     margin: auto;
 }
 
+.game-version_info-box {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    color: white;
+}
+
 

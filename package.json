@@ -1,11 +1,11 @@
 {
   "name": "tic-tac-toe-v2",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "VITE_APP_VERSION=$npm_package_version tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
